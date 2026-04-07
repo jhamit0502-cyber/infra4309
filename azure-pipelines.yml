@@ -1,0 +1,43 @@
+trigger:
+- main
+
+pool: aprilajentpool1
+
+stages:
+- stage: inittoplan
+  displayName: inittoplan
+
+  jobs:
+  - job: TerraformJob
+    displayName: inittoplanwalajob
+
+    steps:
+    - task: TerraformInstaller@1
+      inputs:
+        terraformVersion: 'latest'
+
+    - task: TerraformTask@5
+      displayName: Terraform Init
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        backendServiceArm: 'laduconection'
+        backendAzureRmResourceGroupName: 'rg-vedu-backend'
+        backendAzureRmStorageAccountName: 'vedustg0302'
+        backendAzureRmContainerName: 'vedu-container'
+        backendAzureRmKey: 'vedu.tfstate'
+    - task: TerraformTask@5
+      displayName: Terraform validate
+      inputs:
+        provider: 'azurerm'
+        command: 'validate'
+    - task: TerraformTask@5
+      displayName: Terraform plan
+      inputs:
+        provider: 'azurerm'
+        command: 'plan'
+    - task: TerraformTask@5
+      displayName: apply
+      inputs:
+        provider: 'azurerm'
+        command: 'apply'
